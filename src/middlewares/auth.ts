@@ -1,11 +1,22 @@
-import { Request, Response, NextFunction } from "express";
+import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
+import { SECRET_KEY } from '../types/constants';
+import AuthError from '../types/Errors/AuthError';
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
-  (req as any).user = {
-    _id: "62ee48ebac24c26533c50b9a",
-  };
+  const { authorization } = req.headers;
+  const token = authorization!.replace('Bearer ', '');
+  let payload;
 
-  next();
+  try {
+    payload = jwt.verify(token, SECRET_KEY);
+  } catch (err) {
+    throw new AuthError('Необходима авторизация');
+  }
+
+  (req as any).user = payload;
+
+  return next();
 };
 
-export { auth };
+export default auth;
