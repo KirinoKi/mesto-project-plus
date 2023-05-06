@@ -1,10 +1,10 @@
 interface ISuccessResponse<T = any> {
-  status: "success";
+  status: 'success';
   data: T;
 }
 
 interface IErrorResponse {
-  status: "error";
+  status: 'error';
   message: string;
 }
 
