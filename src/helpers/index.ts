@@ -1,3 +1,4 @@
+import validator from 'validator';
 import { ISuccessResponse, IErrorResponse } from '../types/interfaces';
 
 const successResponse = (data: any): ISuccessResponse => ({
@@ -12,7 +13,8 @@ const errorResponse = (message: string): IErrorResponse => ({
 
 const urlRegexp = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/; // eslint-disable-line
 const urlValidator = (value: string) => urlRegexp.test(value);
+const emailValidate = (str: string) => validator.isEmail(str);
 
 export {
-  successResponse, errorResponse, urlValidator, urlRegexp,
+  successResponse, errorResponse, urlValidator, urlRegexp, emailValidate,
 };

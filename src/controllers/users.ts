@@ -57,7 +57,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
     if (!user) {
       throw new AuthError(INVALID_EMAIL_OR_PASSWORD_MESSAGE);
     }
-    bcrypt.compare(password, user.password).then((matched) => {
+   return bcrypt.compare(password, user.password).then((matched) => {
       if (!matched) {
         throw new AuthError(INVALID_EMAIL_OR_PASSWORD_MESSAGE);
       }

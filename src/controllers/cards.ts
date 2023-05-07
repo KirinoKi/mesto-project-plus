@@ -5,44 +5,48 @@ import { successResponse } from '../helpers';
 import NotFoundError from '../types/Errors/NotFoundError';
 import ForbiddenError from '../types/Errors/ForbiddenError';
 
-const getCards = (req: Request, res: Response, next: NextFunction) => {
+interface Req extends Request {
+  user?: string | any
+}
+
+const getCards = (req: Req, res: Response, next: NextFunction) => {
   Card.find({})
     .then((cards) => res.status(200).send(successResponse(cards)))
     .catch(next);
 };
 
-const createCard = (req: Request, res: Response, next: NextFunction) => {
-  Card.create({ ...req.body, owner: (req as any).user._id })
+const createCard = (req: Req, res: Response, next: NextFunction) => {
+  Card.create({ ...req.body, owner: req.user._id })
     .then((card) => res.status(201).send(successResponse(card)))
     .catch(next);
 };
 
-const deleteCard = (req: Request, res: Response, next: NextFunction) => {
-  Card.findById(req.params.cardId).then((card) => {
-    if ((card?.owner as any).equals((req as any).user._id)) {
-      Card.deleteOne({ _id: req.params.cardId })
-        .then((data) => {
-          if (data.deletedCount === 0) {
-            throw new NotFoundError(POST_NOT_FOUND_MESSAGE);
-          }
-          res.status(200).send(successResponse({ message: 'Пост удалён' }));
-        })
-        .catch(next);
-    } else {
-      throw new ForbiddenError('Пользователь не может удалить чужую карточку.');
-    }
-  }).catch(next);
+const deleteCard = (req: Req, res: Response, next: NextFunction) => {
+  const id = req.params.cardId;
+  const userId = req.user?._id;
+
+  return Card.findById(id)
+    .then((card) => {
+      if(!card) {
+        throw new NotFoundError('Такой карточки не существует')
+      }
+      if (String(card?.owner) !== userId) {
+        throw new ForbiddenError('Это не ваша карточка');
+      }
+      card?.delete();
+      res.send(card);
+    })
+    .catch(next);
 };
 
-const likeCard = (req: Request, res: Response, next: NextFunction) => {
+const likeCard = (req: Req, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {
-      $addToSet: { likes: (req as any).user._id },
+      $addToSet: { likes: req.user._id },
     },
     {
       new: true,
-      runValidators: true,
     },
   )
     .then((data) => {
@@ -54,15 +58,14 @@ const likeCard = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-const unlikeCard = (req: Request, res: Response, next: NextFunction) => {
+const unlikeCard = (req: Req, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {
-      $pull: { likes: (req as any).user._id },
+      $pull: { likes: req.user._id },
     },
     {
       new: true,
-      runValidators: true,
     },
   )
     .then((data) => {
