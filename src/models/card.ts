@@ -1,4 +1,5 @@
 import { Schema, ObjectId, model } from 'mongoose';
+import { urlValidator } from '../helpers';
 
 export interface ICard {
   name: string;
@@ -18,6 +19,10 @@ const cardSchema = new Schema<ICard>({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator: urlValidator,
+      message: 'Неверно указан url',
+    },
   },
   owner: {
     type: Schema.Types.ObjectId,
@@ -35,7 +40,7 @@ const cardSchema = new Schema<ICard>({
   },
   createdAt: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
 });
 

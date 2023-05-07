@@ -1,9 +1,13 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { SECRET_KEY } from '../types/constants';
 import AuthError from '../types/Errors/AuthError';
 
-const auth = (req: Request, res: Response, next: NextFunction) => {
+interface IAuthReq extends Request {
+  user?: string | JwtPayload
+}
+
+const auth = (req: IAuthReq, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
   const token = authorization!.replace('Bearer ', '');
   let payload;
@@ -14,7 +18,7 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
     throw new AuthError('Необходима авторизация');
   }
 
-  (req as any).user = payload;
+  req.user = payload as { _id: JwtPayload};
 
   return next();
 };

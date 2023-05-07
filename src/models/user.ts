@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { urlValidator } from '../helpers';
+import { urlValidator, emailValidate } from '../helpers';
 import { DEFAULT_USER_NAME, DEFAULT_USER_ABOUT, DEFAULT_USER_AVATAR } from '../types/constants';
 
 export interface IUser {
@@ -35,6 +35,10 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
     unique: true,
+    validate: {
+      validator: emailValidate,
+      message: 'Невалидный email',
+    },
   },
   password: {
     type: String,
