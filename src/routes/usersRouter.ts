@@ -10,6 +10,7 @@ const usersRouter = Router();
 
 export default usersRouter
   .get('/', getUsers)
-  .get('/:id', getUserById, getUserByIdValidation())
+  .get('/me', getUsers)
+  .get('/:userId', getUserByIdValidation(), getUserById)
   .patch('/me', updateUserValidator(), updateUser)
   .patch('/me/avatar', updateUserAvatarValidator(), updateUser);

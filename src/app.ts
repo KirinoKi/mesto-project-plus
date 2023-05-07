@@ -1,4 +1,4 @@
-import express, { NextFunction, Response, Request } from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
 import { errors } from 'celebrate';
 import usersRouter from './routes/usersRouter';
@@ -8,11 +8,7 @@ import auth from './middlewares/auth';
 import handleErrors from './middlewares/handleErrors';
 import { requestLogger, errorLogger } from './middlewares/logger';
 import authValidator from './validators/authValidator';
-
-interface Error {
-  statusCode: number,
-  message: string,
-}
+import NotFoundError from './types/Errors/NotFoundError';
 
 const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb');
@@ -27,21 +23,9 @@ app.use('', authRouter);
 app.use(authValidator(), auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use((
-  err: Error,
-  _req: Request,
-  _res: Response,
-  // eslint-disable-next-line no-unused-vars
-  next: NextFunction,
-) => {
-  const { statusCode = 500, message } = err;
-  _res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
+
+app.get("*", () => {
+  throw new NotFoundError("Такой страницы не существует");
 });
 
 app.use(errorLogger);

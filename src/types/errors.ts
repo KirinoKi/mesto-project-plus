@@ -7,5 +7,8 @@ export enum ErrorTypesEnum { // eslint-disable-line
 
 export const USER_NOT_FOUND_MESSAGE = 'Пользователь не найден.';
 export const POST_NOT_FOUND_MESSAGE = 'Пост не найден.';
+export const userAlreadyExist = 'Пользователь уже существует';
+export const validationsError = 'validationError';
+export const existUserCode = 11000;
 
 export const INVALID_EMAIL_OR_PASSWORD_MESSAGE = 'Неправильная почта или пароль.';
