@@ -11,13 +11,13 @@ const getCards = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-const createCard = (req: Request, res: Response, next: NextFunction) => {
+const createCard = (req: Request & { user?: { _id: string } }, res: Response, next: NextFunction) => {
   Card.create({ ...req.body, owner: req.user?._id })
     .then((card) => res.status(201).send(successResponse(card)))
     .catch(next);
 };
 
-const deleteCard = (req: Request, res: Response, next: NextFunction) => {
+const deleteCard = (req: Request & { user?: { _id: string } }, res: Response, next: NextFunction) => {
   const id = req.params.cardId;
   const userId = req.user?._id;
 
@@ -36,7 +36,7 @@ const deleteCard = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-const likeCard = (req: Request, res: Response, next: NextFunction) => {
+const likeCard = (req: Request & { user?: { _id: string } }, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {
@@ -55,7 +55,7 @@ const likeCard = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-const unlikeCard = (req: Request, res: Response, next: NextFunction) => {
+const unlikeCard = (req: Request & { user?: { _id: string } }, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {

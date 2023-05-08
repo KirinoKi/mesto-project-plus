@@ -16,8 +16,8 @@ const getUsers = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-const getUserById = (req: Request, res: Response, next: NextFunction) => {
-  User.findById(req.user._id)
+const getUserById = (req: Request & { user?: { _id: string } }, res: Response, next: NextFunction) => {
+  User.findById(req.user?._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(USER_NOT_FOUND_MESSAGE);
@@ -45,7 +45,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
       });
   };
 
-const updateUser = (req: Request, res: Response, next: NextFunction) => {
+const updateUser = (req: Request & { user?: { _id: string } }, res: Response, next: NextFunction) => {
   User.findByIdAndUpdate(req.user?._id, req.body, {
     new: true,
     runValidators: true,
