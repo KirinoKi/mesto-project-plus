@@ -16,8 +16,8 @@ const getUsers = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-const getUserById = (req: Request & { user?: { _id: string } }, res: Response, next: NextFunction) => {
-  User.findById(req.user?._id)
+const getUserById = (req: Request, res: Response, next: NextFunction) => {
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError(USER_NOT_FOUND_MESSAGE);
@@ -28,12 +28,10 @@ const getUserById = (req: Request & { user?: { _id: string } }, res: Response, n
 };
 
 const createUser = (req: Request, res: Response, next: NextFunction) => {
-  bcrypt.hash(req.body.password, 10).then((passwordHash: any) => {
-    User.create({ ...req.body, password: passwordHash })
-      .then((user) => {
-        const { password, ...rest } = user.toObject();
-        res.send(successResponse(rest));
-      })})
+  bcrypt.hash(req.body.password, 10).then(async (passwordHash: any) => {
+    const user = await User.create({ ...req.body, password: passwordHash });
+    const { password, ...rest } = user.toObject();
+    res.send(successResponse(rest));})
       .catch((err: { name: string; code: number; }) => {
         if (err.name === validationsError) {
           next(new BadRequestError('Указаны не корректные данные'));
@@ -76,6 +74,17 @@ const login = (req: Request, res: Response, next: NextFunction) => {
   }).catch(next);
 };
 
+const getMe = (
+  req: Request & { user?: { _id: string } },
+  res: Response,
+  next: NextFunction,
+) => {
+  User.findById(req.user?._id)
+    .orFail(new NotFoundError(USER_NOT_FOUND_MESSAGE))
+    .then((user) => res.send(user))
+    .catch(next);
+};
+
 export {
-  getUsers, getUserById, createUser, updateUser, login,
+  getUsers, getUserById, createUser, updateUser, login, getMe,
 };
