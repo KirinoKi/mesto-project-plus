@@ -29,8 +29,7 @@ const deleteCard = (req: Request & { user?: { _id: string } }, res: Response, ne
       if (String(card?.owner) !== userId) {
         throw new ForbiddenError('Это не ваша карточка');
       }
-     res.send(card);
-     return card?.delete();
+     return card?.delete().then(() => res.send(card));
     }
     )
     .catch(next);

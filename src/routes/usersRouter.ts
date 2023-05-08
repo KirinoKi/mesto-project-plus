@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  getUsers, getUserById, updateUser,
+  getUsers, getUserById, updateUser, getMe,
 } from '../controllers/users';
 import updateUserValidator from '../validators/updateUserValidator';
 import updateUserAvatarValidator from '../validators/updateUserAvatarValidator';
@@ -10,7 +10,7 @@ const usersRouter = Router();
 
 export default usersRouter
   .get('/', getUsers)
-  .get('/me', getUsers)
+  .get('/me', getMe)
   .get('/:userId', getUserByIdValidation(), getUserById)
   .patch('/me', updateUserValidator(), updateUser)
   .patch('/me/avatar', updateUserAvatarValidator(), updateUser);
